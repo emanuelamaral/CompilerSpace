@@ -1,0 +1,57 @@
+/**
+ * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+ */options{  static = true;}PARSER_BEGIN(Space)
+public class Space{  public static void main(String args []) throws ParseException  {    Space parser = new Space(System.in);    while (true)    {      System.out.println("Reading from standard input...");      System.out.print("Enter an expression like \"1+(2+3)*4;\" :");      try      {        switch (Space.inicio())        {          case 0 :           System.out.println("OK.");          break;          case 1 :           System.out.println("Goodbye.");          break;          default :           break;        }      }      catch (Exception e)      {        System.out.println("NOK.");        System.out.println(e.getMessage());        Space.ReInit(System.in);      }      catch (Error e)      {        System.out.println("Oops.");        System.out.println(e.getMessage());        break;      }    }  }}PARSER_END(Space)SKIP :{  " "| "\r"| "\t"| "\n"}TOKEN : /* OPERADORES ARITMETICOS*/{  < MAIS 			: "+" >| < MENOS 			: "-" >| < VEZES 			: "*" >| < DIVIDE 			: "/" >
+}
+
+TOKEN : /* OPERADORES RELACIONAIS*/
+{
+  < MAIOR 		: " >"	>
+| < MENOR 		: "< "	>
+| < MAIOR_IGUAL 	: " >=" >
+| < MENOR_IGUAL 	: "< =" >
+| < IGUAL_IGUAL 	: "=="	>
+| < DIFERENTE	: "!="	>
+}
+
+TOKEN : /* OPERADORES DE ATRIBUICAO*/
+{
+  < IGUAL		:	"="		>
+| < MAIS_IGUAL	:	"+="	>
+| < MENOS_IGUAL  :   "-="	>
+}
+
+TOKEN : /* OPERADORES LOGICOS*/
+{
+  	< E			: "and"		>
+|   < OU 		: "or"		>
+|   < NEGACAO 	: "not"		>
+}
+
+TOKEN : /* OPERADORES DE DELIMITACAO*/
+{
+  
+  < INICIO_FIM_BLOCO	 	: ":"		>
+| < PONTO_VIRGULA			: ";" 		>
+| < INICIA_VARIAVEL 		: "__"		>
+| < ABRE_PARENTESES			: "("		>
+| < FECHA_PARENTESES		: ")"		>
+}
+
+TOKEN : /* PALAVRAS RESERVADAS*/
+{
+  < BIG_BANG			:	"big_bang"		>
+| < VARIAVEL_PULSAR		:	"pulsar" 		>
+| < VARIAVEL_QUASAR  	:	"quasar" 		>
+| < VARIAVEL_ESTRELA 	:	"estrela"		>
+| < BURACO_BRANCO		:	"buraco_branco" >
+| < BURACO_NEGRO		:	"buraco_negro"	>
+| < ORBITA				:	"orbita"		>
+| < TRANSLACAO			:	"translacao"	>
+| < ANA_BRANCA			:	"ana_branca"	>
+| < ANA_MARROM 			:	"ana_marrom"	>}
+
+TOKEN : /* IDENTIFICADOR */
+{
+  < ID 	:	 < LETRA >(< LETRA> | < DIGITO>)* >}TOKEN :  /* TERMINAIS COMPLEXOS */{  < NUMERO 	: (< DIGITO >)+ 		>| < DIGITO 	: [ "0"-"9" ] 			>
+| < LETRA	: ["A"-"Z"] | ["a"-"z"] >}int inicio() :{}{	}
