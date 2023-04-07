@@ -1,57 +1,204 @@
 /**
  * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
  */options{  static = true;}PARSER_BEGIN(Space)
-public class Space{  public static void main(String args []) throws ParseException  {    Space parser = new Space(System.in);    while (true)    {      System.out.println("Reading from standard input...");      System.out.print("Enter an expression like \"1+(2+3)*4;\" :");      try      {        switch (Space.inicio())        {          case 0 :           System.out.println("OK.");          break;          case 1 :           System.out.println("Goodbye.");          break;          default :           break;        }      }      catch (Exception e)      {        System.out.println("NOK.");        System.out.println(e.getMessage());        Space.ReInit(System.in);      }      catch (Error e)      {        System.out.println("Oops.");        System.out.println(e.getMessage());        break;      }    }  }}PARSER_END(Space)SKIP :{  " "| "\r"| "\t"| "\n"}TOKEN : /* OPERADORES ARITMETICOS*/{  < MAIS 			: "+" >| < MENOS 			: "-" >| < VEZES 			: "*" >| < DIVIDE 			: "/" >
+public class Space{  public static void main(String args []) throws ParseException  {    Space parser = new Space(System.in);    while (true)    {      System.out.println("Lendo a entrada");      System.out.println("Informe um programa:");      try      {
+
+//        Space.inicio();
+        switch (Space.inicio())
+        {
+          case 0 : 
+          System.out.println("OK.");
+          break;
+          case 1 : 
+          System.out.println("Goodbye.");
+          break;
+          default : 
+          break;
+        }
+      }      catch (Exception e)      {        System.out.println("NOK.");        System.out.println(e.getMessage());        Space.ReInit(System.in);      }      catch (Error e)      {        System.out.println("Oops.");        System.out.println(e.getMessage());        break;      }    }  }}PARSER_END(Space)SKIP :{
+  " "| "\r"
+| "\t"}TOKEN : /* OPERADORES ARITMETICOS*/{  < MAIS 			: "+" >| < MENOS 			: "-" >| < VEZES 			: "*" >| < DIVIDE 			: "/" >
 }
 
 TOKEN : /* OPERADORES RELACIONAIS*/
 {
-  < MAIOR 		: " >"	>
-| < MENOR 		: "< "	>
+  < MAIOR 			: " >"	>
+| < MENOR 			: "< "	>
 | < MAIOR_IGUAL 	: " >=" >
 | < MENOR_IGUAL 	: "< =" >
 | < IGUAL_IGUAL 	: "=="	>
-| < DIFERENTE	: "!="	>
+| < DIFERENTE		: "!="	>
 }
 
 TOKEN : /* OPERADORES DE ATRIBUICAO*/
 {
-  < IGUAL		:	"="		>
-| < MAIS_IGUAL	:	"+="	>
-| < MENOS_IGUAL  :   "-="	>
+  < IGUAL		:	"="	 >
+| < MAIS_IGUAL	:	"+=" >
+| < MENOS_IGUAL :   "-=" >
+| < IN			:	"in" >
 }
 
 TOKEN : /* OPERADORES LOGICOS*/
 {
-  	< E			: "and"		>
-|   < OU 		: "or"		>
-|   < NEGACAO 	: "not"		>
+  	< AND		: "and"		>
+|   < OR 		: "or"		>
+|   < NOT 		: "not"		>
 }
 
 TOKEN : /* OPERADORES DE DELIMITACAO*/
 {
   
-  < INICIO_FIM_BLOCO	 	: ":"		>
-| < PONTO_VIRGULA			: ";" 		>
-| < INICIA_VARIAVEL 		: "__"		>
-| < ABRE_PARENTESES			: "("		>
-| < FECHA_PARENTESES		: ")"		>
+  < INICIO_FIM_BLOCO	 	: ":"	>
+| < VIRGULA					: "," 	>
+| < PONTO_VIRGULA			: ";" 	>
+| < INICIA_VARIAVEL 		: "__"	>
+| < ABRE_PARENTESES			: "("	>
+| < FECHA_PARENTESES		: ")"	>
+//| < TABULACAO				: "\t" 	>
+| < PULA_LINHA				: "\n"  >
+| < DELIMITA_ESTRELA		: "'"	>
 }
 
 TOKEN : /* PALAVRAS RESERVADAS*/
 {
-  < BIG_BANG			:	"big_bang"		>
-| < VARIAVEL_PULSAR		:	"pulsar" 		>
-| < VARIAVEL_QUASAR  	:	"quasar" 		>
-| < VARIAVEL_ESTRELA 	:	"estrela"		>
-| < BURACO_BRANCO		:	"buraco_branco" >
-| < BURACO_NEGRO		:	"buraco_negro"	>
-| < ORBITA				:	"orbita"		>
-| < TRANSLACAO			:	"translacao"	>
-| < ANA_BRANCA			:	"ana_branca"	>
-| < ANA_MARROM 			:	"ana_marrom"	>}
+  < BIG_BANG		:	"big_bang"		>
+| < TIPO_LUA		:	"lua" 			>
+| < TIPO_QUASAR  	:	"quasar" 		>
+| < TIPO_ESTRELA 	:	"estrela"		>
+| < BURACO_BRANCO	:	"buraco_branco" >
+| < BURACO_NEGRO	:	"buraco_negro"	>
+| < ORBITA			:	"orbita"		>
+| < TRANSLACAO		:	"translacao"	>
+| < ANA_BRANCA		:	"ana_branca"	>
+| < ANA_MARROM 		:	"ana_marrom"	>
+| < ESPACO			:	"espaco"		>
+| < LAMBDA			:	"lambda"		>
+| < TIPO_VACUO		:	"vacuo"			>
+| < GALAXIA			:	"galaxia"		>
+| < SUPER_NOVA		:	"$"				>}
 
 TOKEN : /* IDENTIFICADOR */
 {
   < ID 	:	 < LETRA >(< LETRA> | < DIGITO>)* >}TOKEN :  /* TERMINAIS COMPLEXOS */{  < NUMERO 	: (< DIGITO >)+ 		>| < DIGITO 	: [ "0"-"9" ] 			>
-| < LETRA	: ["A"-"Z"] | ["a"-"z"] >}int inicio() :{}{	}
+| < LETRA	: ["A"-"Z"] | ["a"-"z"] >}int inicio() :{}{   (tipoRetorno()< GALAXIA>< ID>< ABRE_PARENTESES>< FECHA_PARENTESES>< INICIO_FIM_BLOCO>< PULA_LINHA> (bloco())* < INICIO_FIM_BLOCO> < PULA_LINHA>
+|	< LAMBDA>< INICIO_FIM_BLOCO>< PULA_LINHA> (constantes())*< INICIO_FIM_BLOCO>< PULA_LINHA>)*
+	<BIG_BANG><INICIO_FIM_BLOCO>< PULA_LINHA> (bloco())*< INICIO_FIM_BLOCO> < PULA_LINHA>
+{ return 0; } 
+}
+
+void tipoRetorno():
+{}
+{
+  < TIPO_VACUO> | < TIPO_QUASAR> | < TIPO_LUA> | < TIPO_ESTRELA>
+}
+
+void constantes():
+{}
+{
+	declaracaoDeVariaveis() < IGUAL> (< NUMERO> | gerarEstrela() ) < PULA_LINHA>
+}
+
+void bloco() :
+{}
+{
+	(declaracaoDeVariaveis()  | comandos())* < PULA_LINHA>
+    				
+}
+
+void declaracaoDeVariaveis() :
+{}
+{
+	 < INICIA_VARIAVEL > tipoDeVariavel() < ID> (modoDaVariavel())*
+}
+
+void comandos() :
+{}
+{
+  (atribuicao())
+| (< ANA_BRANCA> < ABRE_PARENTESES> condicao() decideFinal())(< INICIO_FIM_BLOCO> (bloco())* decideAnaMarrom())
+| (< ORBITA> < ABRE_PARENTESES> < ID> < IN> < ESPACO> configuraEspaco()< FECHA_PARENTESES>)(< INICIO_FIM_BLOCO> (bloco())* < INICIO_FIM_BLOCO>)
+| (< TRANSLACAO > < ABRE_PARENTESES> condicao()decideFinal())(< INICIO_FIM_BLOCO> (bloco())* < INICIO_FIM_BLOCO>)
+| (< BURACO_NEGRO>< ABRE_PARENTESES>< INICIA_VARIAVEL>tipoDeVariavel()< VIRGULA>expressao()< FECHA_PARENTESES>)
+| (< BURACO_BRANCO>< ABRE_PARENTESES>expressao()< FECHA_PARENTESES>)
+}
+void atribuicao():
+{}
+{
+  < ID> tipoAtribuicao() (valorPrimitivo()(modoDeAtribuicao())*)
+}
+
+void tipoAtribuicao():
+{}
+{
+  < IGUAL> | < MAIS_IGUAL> | < MENOS_IGUAL> 
+}
+
+void modoDeAtribuicao():
+{}
+{
+  operacaoAritmetica() valorPrimitivo()
+}
+
+void valorPrimitivo():
+{}
+{
+  < NUMERO> | gerarEstrela() | < ID>
+}
+
+void operacaoAritmetica():
+{}
+{
+ ( < MAIS> | < MENOS> | < VEZES> | < DIVIDE> | < ABRE_PARENTESES> | < FECHA_PARENTESES> )
+}
+
+void decideAnaMarrom():
+{}
+{
+  < INICIO_FIM_BLOCO> (< PULA_LINHA >bloco() | < ANA_MARROM> < INICIO_FIM_BLOCO>(bloco())* < INICIO_FIM_BLOCO>)
+}
+
+void condicao():
+{}
+{
+  expressao()(< MAIOR> | < MENOR> | < MAIOR_IGUAL> | < MENOR_IGUAL> | < IN>)+expressao()
+}
+
+void expressao() :
+{}
+{
+  < ID> | < NUMERO> | gerarEstrela()
+}
+
+void decideFinal() :
+{}
+{
+  (< AND> condicao()| < OR> condicao())*< FECHA_PARENTESES>
+}
+
+void configuraEspaco():
+{}
+{
+	< ABRE_PARENTESES>< NUMERO>< VIRGULA>< NUMERO>< FECHA_PARENTESES>  
+}
+
+void gerarEstrela():
+{}
+{
+  < DELIMITA_ESTRELA>(< NUMERO> | < ID>)*< DELIMITA_ESTRELA>
+}
+
+void tipoDeVariavel() :
+{}
+{
+  < TIPO_QUASAR> | < TIPO_ESTRELA> | < TIPO_LUA>}
+
+void valorAtribuicao() :
+{}
+{
+  < NUMERO> | < LETRA> | "lua_cheia" | "lua_nova"| < ID> }
+
+
+void modoDaVariavel() :
+{}
+{
+  < VIRGULA> < ID>}
