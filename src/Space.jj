@@ -75,12 +75,13 @@ TOKEN : /* PALAVRAS RESERVADAS*/
 | < LAMBDA			:	"lambda"		>
 | < TIPO_VACUO		:	"vacuo"			>
 | < GALAXIA			:	"galaxia"		>
-| < SUPER_NOVA		:	"$"				>}
+| < SUPER_NOVA		:	"$"				>
+| < RETORNO			:	"retorno"		>}
 
 TOKEN : /* IDENTIFICADOR */
 {
   < ID 	:	 < LETRA >(< LETRA> | < DIGITO>)* >}TOKEN :  /* TERMINAIS COMPLEXOS */{  < NUMERO 	: (< DIGITO >)+ 		>| < DIGITO 	: [ "0"-"9" ] 			>
-| < LETRA	: ["A"-"Z"] | ["a"-"z"] >}int inicio() :{}{   (tipoRetorno()< GALAXIA>< ID>< ABRE_PARENTESES>< FECHA_PARENTESES>< INICIO_FIM_BLOCO>< PULA_LINHA> (bloco())* < INICIO_FIM_BLOCO> < PULA_LINHA>
+| < LETRA	: ["A"-"Z"] | ["a"-"z"] >}int inicio() :{}{   (tipoRetorno()< GALAXIA>< ID>< ABRE_PARENTESES>< FECHA_PARENTESES>< INICIO_FIM_BLOCO>< PULA_LINHA> (bloco())* < RETORNO> valorPrimitivo() < INICIO_FIM_BLOCO> < PULA_LINHA>
 |	< LAMBDA>< INICIO_FIM_BLOCO>< PULA_LINHA> (constantes())*< INICIO_FIM_BLOCO>< PULA_LINHA>)*
 	<BIG_BANG><INICIO_FIM_BLOCO>< PULA_LINHA> (bloco())*< INICIO_FIM_BLOCO> < PULA_LINHA>
 { return 0; } 
