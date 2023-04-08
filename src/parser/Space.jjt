@@ -322,7 +322,7 @@ void decideAnaMarrom():
 {RecoverySet decAnaMarromSinc = First.decideAnaMarrom;}
 {
   	try { 
-  		inicioFimBloco() (pulaLinha()bloco() | anaMarrom() inicioFimBloco()(bloco())* inicioFimBloco())
+  		inicioFimBloco() (anaMarrom() inicioFimBloco()(bloco())* inicioFimBloco())*
 	}catch(ParseException e) {
 		consumeUntil(decAnaMarromSinc, e, "Erro em - > decideAnaMarrom()");
 	}
