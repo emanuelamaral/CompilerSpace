@@ -183,6 +183,8 @@ TOKEN : /* PALAVRAS RESERVADAS*/
 | < GALAXIA			:	"galaxia"		>
 | < SUPER_NOVA		:	"$"				>
 | < RETORNO			:	"retorno"		>
+| < LUA_CHEIA		:	"lua_cheia"		>
+| < LUA_NOVA		:	"lua_nova"		>
 }
 
 TOKEN : /* IDENTIFICADOR */
@@ -200,11 +202,15 @@ TOKEN :  /* TERMINAIS COMPLEXOS */
 /* NÃO TERMINAIS */
 
 SimpleNode inicio() :
-{}
+{/*RecoverySet inicioSinc = First.inicio;*/}
 {
-   (tipoRetorno() galaxia() identificador() abreParenteses() fechaParenteses() inicioFimBloco() pulaLinha() (bloco())* retorno() valorPrimitivo() inicioFimBloco() pulaLinha()
-|	lambda() inicioFimBloco() pulaLinha() (constantes())* inicioFimBloco() pulaLinha())*
-	bigBang() inicioFimBloco() pulaLinha() (bloco())* inicioFimBloco() pulaLinha()
+//  	try { 
+   		(tipoRetorno() galaxia() identificador() abreParenteses() fechaParenteses() inicioFimBloco() pulaLinha() (bloco())* retorno() valorPrimitivo() inicioFimBloco() pulaLinha()
+|		lambda() inicioFimBloco() pulaLinha() (constantes())* inicioFimBloco() pulaLinha())*
+		bigBang() inicioFimBloco() pulaLinha() (bloco())* inicioFimBloco() pulaLinha()
+//	}catch(ParseException e) {
+//		consumeUntil(inicioSinc, e, "Erro em -- > inicio()");
+//	}
 { return jjtThis; } 
 }
 
@@ -219,16 +225,23 @@ void tipoRetorno():
 }
 
 void constantes():
-{}
+{RecoverySet constantesSinc = First.constantes;}
 {
-	declaracaoDeVariaveis() igual() (numero() | gerarEstrela() ) pulaLinha()
+	try {
+		declaracaoDeVariaveis() igual() (numero() | gerarEstrela() ) pulaLinha()
+	}catch(ParseException e) {
+		consumeUntil(constantesSinc, e, "Erro em - > constantes()");
+	}
 }
 
 void bloco() :
-{}
+{RecoverySet blocoSinc = First.bloco;}
 {
-	(declaracaoDeVariaveis()  | comandos())* pulaLinha()
-    				
+  	try {
+		(declaracaoDeVariaveis()  | comandos())* pulaLinha()
+	}catch(ParseException e) {
+		consumeUntil(blocoSinc, e, "Erro em - > bloco()");
+	}				
 }
 
 void declaracaoDeVariaveis() :
@@ -242,97 +255,147 @@ void declaracaoDeVariaveis() :
 }
 
 void comandos() :
-{}
+{RecoverySet comandosSinc = First.comandos;}
 {
-  (atribuicao())
-| (anaBranca() abreParenteses() condicao() decideFinal())(inicioFimBloco() (bloco())* decideAnaMarrom())
-| (orbita() abreParenteses() identificador() in() espaco() configuraEspaco()fechaParenteses())(inicioFimBloco() (bloco())* inicioFimBloco())
-| (translacao() abreParenteses() condicao()decideFinal())(inicioFimBloco() (bloco())* inicioFimBloco())
-| (buracoNegro()abreParenteses()iniciaVariavel()tipoDeVariavel()virgula()expressao()fechaParenteses())
-| (buracoBranco()abreParenteses()expressao()fechaParenteses())
+  	try { 
+	  	(atribuicao())
+| 		(anaBranca() abreParenteses() condicao() decideFinal())(inicioFimBloco() (bloco())* decideAnaMarrom())
+|		(orbita() abreParenteses() identificador() in() espaco() configuraEspaco()fechaParenteses())(inicioFimBloco() (bloco())* inicioFimBloco())
+| 		(translacao() abreParenteses() condicao()decideFinal())(inicioFimBloco() (bloco())* inicioFimBloco())
+| 		(buracoNegro()abreParenteses()iniciaVariavel()tipoDeVariavel()virgula()expressao()fechaParenteses())
+|		 (buracoBranco()abreParenteses()expressao()fechaParenteses())
+	}catch(ParseException e) {
+		consumeUntil(comandosSinc, e, "Erro em - > comandos()");
+	}
 }
 void atribuicao():
-{}
+{RecoverySet atribSinc = First.atribuicao;}
 {
-  identificador() tipoAtribuicao() (valorPrimitivo()(modoDeAtribuicao())*)
+  	try { 
+  		identificador() tipoAtribuicao() (valorPrimitivo()(modoDeAtribuicao())*)
+	}catch(ParseException e) {
+		consumeUntil(atribSinc, e, "Erro em - > atribuicao()");
+	}
 }
 
 void tipoAtribuicao():
-{}
+{RecoverySet tipoAtribSinc = First.tipoAtribuicao;}
 {
-  igual() | maisIgual() | menosIgual()
+  	try {
+  		igual() | maisIgual() | menosIgual()
+	}catch(ParseException e) {
+		consumeUntil(tipoAtribSinc, e, "Erro em - > tipoAtribuicao()");
+	}
 }
 
 void modoDeAtribuicao():
-{}
+{RecoverySet modoAtribSinc = First.modoDeAtribuicao;}
 {
-  operacaoAritmetica() valorPrimitivo()
+  	try { 
+  		operacaoAritmetica() valorPrimitivo()
+	}catch(ParseException e) {
+		consumeUntil(modoAtribSinc, e, "Erro em - > modoDeAtribuicao()");
+	}  
 }
 
 void valorPrimitivo():
-{}
+{RecoverySet valorPrimSinc = First.valorPrimitivo;}
 {
-  numero() | gerarEstrela() | identificador()
+  	try { 
+  		numero() | gerarEstrela() | identificador() | luaCheia() | luaNova() | tipoVacuo()
+	}catch(ParseException e) {
+		consumeUntil(valorPrimSinc, e, "Erro em - > valorPrimitivo()");
+	}
 }
 
 void operacaoAritmetica():
-{}
+{RecoverySet opSinc = First.operacaoAritmetica;}
 {
- ( mais() | menos() | vezes() | divide() | abreParenteses() | fechaParenteses() )
+  	try { 
+ 		( mais() | menos() | vezes() | divide() | abreParenteses() | fechaParenteses() )
+	}catch(ParseException e) {
+		consumeUntil(opSinc, e, "Erro em - > operacaoAritmetica()");
+	}
 }
 
 void decideAnaMarrom():
-{}
+{RecoverySet decAnaMarromSinc = First.decideAnaMarrom;}
 {
-  inicioFimBloco() (pulaLinha()bloco() | anaMarrom() inicioFimBloco()(bloco())* inicioFimBloco())
+  	try { 
+  		inicioFimBloco() (pulaLinha()bloco() | anaMarrom() inicioFimBloco()(bloco())* inicioFimBloco())
+	}catch(ParseException e) {
+		consumeUntil(decAnaMarromSinc, e, "Erro em - > decideAnaMarrom()");
+	}
 }
 
 void condicao():
-{}
+{RecoverySet condicaoSinc = First.condicao;}
 {
-  expressao()(maior() | menor() | maiorIgual() | menorIgual() | in())+expressao()
+	try { 
+ 	 	expressao()(maior() | menor() | maiorIgual() | menorIgual() | in())+expressao()
+	}catch(ParseException e) {
+		consumeUntil(condicaoSinc, e, "Erro em - > condicao()");
+	}
 }
 
 void expressao() :
-{}
+{RecoverySet expressaoSinc = First.expressao;}
 {
-  identificador() | numero() | gerarEstrela()
+  	try { 
+ 	 	identificador() | numero() | gerarEstrela()	
+	}catch(ParseException e) {
+		consumeUntil(expressaoSinc, e, "Erro em - > expressao()");
+	}
 }
 
 void decideFinal() :
-{}
+{RecoverySet decideFinalSinc = First.decideFinal;}
 {
-  (and() condicao()| or() condicao())*fechaParenteses()
+  	try { 
+  		(and() condicao()| or() condicao())*fechaParenteses()
+	}catch(ParseException e) {
+		consumeUntil(decideFinalSinc, e, "Erro em - > decideFinal()");
+	}
 }
 
 void configuraEspaco():
-{}
+{RecoverySet configuraEspacoSinc = First.configuraEspaco;}
 {
-	abreParenteses()numero()virgula()numero()fechaParenteses()  
+	try { 
+		abreParenteses()numero()virgula()numero()fechaParenteses()  
+	}catch(ParseException e) {
+		consumeUntil(configuraEspacoSinc, e, "Erro em - > configuraEspaco()");
+	}
 }
 
 void gerarEstrela():
-{}
+{RecoverySet gerarEstrelaSinc = First.gerarEstrela;}
 {
-  delimitaEstrela()(numero() | identificador())*delimitaEstrela()
+  	try { 
+  		delimitaEstrela()(numero() | identificador())*delimitaEstrela()
+	}catch(ParseException e) {
+		consumeUntil(gerarEstrelaSinc, e, "Erro em - > gerarEstrela()");
+	}
 }
 
 void tipoDeVariavel() :
-{}
+{RecoverySet tipoVarSinc = First.tipoVariavel;}
 {
-  tipoQuasar() | tipoEstrela() | tipoLua()
-}
-
-void valorAtribuicao() :
-{}
-{
-  numero() | letra() | luaCheia() | luaNova() | identificador() 
+  	try { 
+  		tipoQuasar() | tipoEstrela() | tipoLua()
+	}catch(ParseException e) {
+		consumeUntil(tipoVarSinc, e, "Erro em - > tipoDeVariavel()");
+	}
 }
 
 void modoDaVariavel() :
-{}
+{RecoverySet modoVarSinc = First.modoVariavel;}
 {
-  virgula() identificador()
+  	try { 
+  		virgula() identificador()
+	}catch(ParseException e) {
+		consumeUntil(modoVarSinc, e, "Erro em - > modoDaVariavel()");
+	}
 }
 
 /* TERMINAIS */
@@ -362,73 +425,49 @@ void tipoEstrela():
 }
 
 void galaxia():
-{RecoverySet galaxiaSinc = First.galaxia;}
+{}
 {
-	try { 
-  		< GALAXIA>
-  	}catch(ParseException e) {
-		consumeUntil(galaxiaSinc, e, "Erro em - > galaxia()");
-  	}
+	< GALAXIA>
 }
 
 void identificador():
-{RecoverySet identificadorSinc = First.identificador;}
+{}
 {
-  	try { 
-  		< ID>
-	}catch(ParseException e) {
-		consumeUntil(identificadorSinc, e, "Erro em - > identificador()");
-	}
+	< ID>
 }
 
 void abreParenteses():
-{RecoverySet abreParenSinc = First.abreParenteses;}
+{}
 {
-  	try { 
-  		< ABRE_PARENTESES>
-	}catch(ParseException e) {
-		consumeUntil(abreParenSinc, e, "Erro em - > abreParenteses()");
-	}	
+
+	< ABRE_PARENTESES>
+
 }
 
 void fechaParenteses():
-{RecoverySet fechaParenSinc = First.fechaParenteses;}
+{}
 {
-  	try { 
-  		< FECHA_PARENTESES>
-	}catch(ParseException e) {
-		consumeUntil(fechaParenSinc, e, "Erro em - > fechaParenteses()");
-	}
+	< FECHA_PARENTESES>
 }
 
 void inicioFimBloco():
-{RecoverySet incioFimBlocoSinc = First.inicioFimBloco;}
+{}
 {
-	try {
-		< INICIO_FIM_BLOCO>
-	}catch(ParseException e) {
-		consumeUntil(incioFimBlocoSinc, e, "Erro em - > inicioFimBloco()");
-	}
+
+	< INICIO_FIM_BLOCO>
+
 }
 
 void pulaLinha():
-{RecoverySet pulaLinhaSinc = First.pulaLinha;}
+{}
 {
-	try { 
-		< PULA_LINHA>
-	}catch(ParseException e) {
-		consumeUntil(pulaLinhaSinc, e, "Erro em - > pulaLinha()");
-	}
+	< PULA_LINHA>
 }
 
 void retorno():
-{RecoverySet retornoSinc = First.retorno;}
+{}
 {
-  	try { 
-  		< RETORNO>
-	}catch(ParseException e) {
-		consumeUntil(retornoSinc, e, "Erro em - > retorno()");
-	}
+	< RETORNO>
 }
 
 void lambda():
@@ -610,12 +649,12 @@ void letra():
 void luaCheia():
 {}
 {
-  "lua_cheia"
+  < LUA_CHEIA>
 }
 
 void luaNova():
 {}
 {
-  "lua_nova"
+  < LUA_NOVA>
 }
 
