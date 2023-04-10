@@ -185,6 +185,7 @@ TOKEN : /* PALAVRAS RESERVADAS*/
 | < RETORNO			:	"retorno"		>
 | < LUA_CHEIA		:	"lua_cheia"		>
 | < LUA_NOVA		:	"lua_nova"		>
+| < BREAK			:	"break"			>
 }
 
 TOKEN : /* IDENTIFICADOR */
@@ -259,11 +260,11 @@ void comandos() :
 {
   	try { 
 	  	(atribuicao())
-| 		(anaBranca() abreParenteses() condicao() decideFinal())(inicioFimBloco() (bloco())* decideAnaMarrom())
-|		(orbita() abreParenteses() identificador() in() espaco() configuraEspaco()fechaParenteses())(inicioFimBloco() (bloco())* inicioFimBloco())
-| 		(translacao() abreParenteses() condicao()decideFinal())(inicioFimBloco() (bloco())* inicioFimBloco())
+| 		(anaBranca() abreParenteses() condicao() decideFinal())(inicioFimBloco() (bloco())* (ativaBreak())* decideAnaMarrom())
+|		(orbita() abreParenteses() identificador() in() espaco() configuraEspaco()fechaParenteses())(inicioFimBloco() (bloco())*  (ativaBreak())* inicioFimBloco())
+| 		(translacao() abreParenteses() condicao()decideFinal())(inicioFimBloco() (bloco())* (ativaBreak())*  inicioFimBloco())
 | 		(buracoNegro()abreParenteses()iniciaVariavel()tipoDeVariavel()virgula()expressao()fechaParenteses())
-|		 (buracoBranco()abreParenteses()expressao()fechaParenteses())
+|		(buracoBranco()abreParenteses()expressao()fechaParenteses())
 	}catch(ParseException e) {
 		consumeUntil(comandosSinc, e, "Erro em - > comandos()");
 	}
@@ -322,7 +323,7 @@ void decideAnaMarrom():
 {RecoverySet decAnaMarromSinc = First.decideAnaMarrom;}
 {
   	try { 
-  		inicioFimBloco() (anaMarrom() inicioFimBloco()(bloco())* inicioFimBloco())*
+  		inicioFimBloco() (anaMarrom() inicioFimBloco()(bloco())* (ativaBreak())* inicioFimBloco())*
 	}catch(ParseException e) {
 		consumeUntil(decAnaMarromSinc, e, "Erro em - > decideAnaMarrom()");
 	}
@@ -342,7 +343,7 @@ void expressao() :
 {RecoverySet expressaoSinc = First.expressao;}
 {
   	try { 
- 	 	identificador() | numero() | gerarEstrela()	
+ 	 	identificador() | numero() | gerarEstrela()	| luaCheia() | luaNova()
 	}catch(ParseException e) {
 		consumeUntil(expressaoSinc, e, "Erro em - > expressao()");
 	}
@@ -658,3 +659,10 @@ void luaNova():
   < LUA_NOVA>
 }
 
+void ativaBreak():
+{}
+
+{
+  	< BREAK> pulaLinha()
+
+}
