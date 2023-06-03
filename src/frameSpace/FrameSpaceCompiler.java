@@ -3,8 +3,8 @@ package frameSpace;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -21,15 +21,26 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import parser.ParseException;
+import parser.SimpleNode;
+import parser.Space;
+
+//import parser.ParseException;
+
 public class FrameSpaceCompiler extends JPanel implements ActionListener{
 	
 	private static final long serialVersionUID = 7834447818830595896L;
 
 	private JButton btPegarArquivo;
 	private JButton btCompilar;
+	private JButton btArvoreConsole;
 	private JFileChooser fcEscolherArquivo;
 	private String title;
 	private JTextArea txCodigo;
+	private SimpleNode arvore;
+	private Space compilador;
+	private File arquivo;
+	
 	
 	public FrameSpaceCompiler() {
 		super();
@@ -39,6 +50,8 @@ public class FrameSpaceCompiler extends JPanel implements ActionListener{
 		
 		tela.setSize(1080, 720);
 		tela.setTitle("Space Compiler");
+		
+		
 		
 		JPanel panelButtons = new JPanel();
 		JPanel panelCodigo = new JPanel();
@@ -65,7 +78,7 @@ public class FrameSpaceCompiler extends JPanel implements ActionListener{
 		panelArvore.setLocation(540, 0);
 		
 		panelButtons.setSize(1080, 100);
-		panelButtons.setLayout(new GridBagLayout());
+		panelButtons.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 30));
 		panelButtons.setLocation(0, 590);
 		panelButtons.setBackground(Color.darkGray);
 		
@@ -79,12 +92,15 @@ public class FrameSpaceCompiler extends JPanel implements ActionListener{
 		setBtCompilar(new JButton("Compilar"));
 		btCompilar.addActionListener(e -> compilarCodigo());
 		
+		setBtArvoreConsole(new JButton("Mostrar Console"));
+		btArvoreConsole.addActionListener(e -> trocarVisualizacao());
+		
 		panelCodigo.add(scrollTextArea);
-		panelButtons.add(labelPrincipal);
-		panelButtons.add(btPegarArquivo);
+//		panelButtons.add(labelPrincipal);
 		panelButtons.add(btCompilar);
-		
-		
+		panelButtons.add(btPegarArquivo);
+		panelButtons.add(btArvoreConsole);
+	
 		
 		tela.setResizable(false);
 		
@@ -94,6 +110,7 @@ public class FrameSpaceCompiler extends JPanel implements ActionListener{
 		
 		tela.getContentPane().add(this, "Center");
 		tela.setVisible(true);
+
 	}
 	
 	@Override
@@ -111,29 +128,22 @@ public class FrameSpaceCompiler extends JPanel implements ActionListener{
 		
 		if(fcEscolherArquivo.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			
-			File arquivo = fcEscolherArquivo.getSelectedFile();
+			setArquivo(fcEscolherArquivo.getSelectedFile());
 			
 			try {
-				BufferedReader codigo = new BufferedReader(new FileReader(arquivo.toString()));
+				BufferedReader codigo = new BufferedReader(new FileReader(getArquivo().toString()));
 				while((texto = codigo.readLine()) != null) {
 					resultado += texto + System.getProperty("line.separator");
 				}
-
 				
 				txCodigo.setText(resultado);
-				System.out.println(resultado);
 				codigo.close();
-				
 				
 			}catch(FileNotFoundException e1) {
 				System.err.println("Arquivo não encontrado!");
 			}catch(IOException e2) {
 				System.err.println("Não foi possivel abrir o arquivo!");
 			}
-			
-			setTxCodigo(new JTextArea());
-			txCodigo.setText(arquivo.toString());
-			 
 			
 		}
 		else {
@@ -142,8 +152,29 @@ public class FrameSpaceCompiler extends JPanel implements ActionListener{
 		
 	}
 	
+	@SuppressWarnings("static-access")
 	public void compilarCodigo() {
+		System.out.println("Aqui será gerado a árvore sintática");
+		System.out.println(getTxCodigo().getText());
 		
+		
+		try {
+//			if(compilador == null) {
+				compilador = new Space(new FileReader(getArquivo()));
+//			}
+			setArvore(compilador.inicio());
+		} catch (ParseException e1) {
+			e1.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		finally {
+//			compilador.ReInit(null);
+		}
+		getArvore().dump(" --->");
+	}
+	
+	public void trocarVisualizacao() {
 	}
 	
 	public Dimension getPreferredSize() {
@@ -195,5 +226,29 @@ public class FrameSpaceCompiler extends JPanel implements ActionListener{
 
 	public void setBtCompilar(JButton btCompilar) {
 		this.btCompilar = btCompilar;
+	}
+
+	public JButton getBtArvoreConsole() {
+		return btArvoreConsole;
+	}
+
+	public void setBtArvoreConsole(JButton btArvoreConsole) {
+		this.btArvoreConsole = btArvoreConsole;
+	}
+
+	public SimpleNode getArvore() {
+		return arvore;
+	}
+
+	public void setArvore(SimpleNode arvore) {
+		this.arvore = arvore;
+	}
+
+	public File getArquivo() {
+		return arquivo;
+	}
+
+	public void setArquivo(File arquivo) {
+		this.arquivo = arquivo;
 	}
 }
