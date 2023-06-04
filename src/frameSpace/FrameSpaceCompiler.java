@@ -21,6 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import frameSpaceExtra.BordaNumerada;
 import parser.ParseException;
 import parser.SimpleNode;
 import parser.Space;
@@ -34,13 +35,20 @@ public class FrameSpaceCompiler extends JPanel implements ActionListener{
 	private JButton btPegarArquivo;
 	private JButton btCompilar;
 	private JButton btArvoreConsole;
-	private JFileChooser fcEscolherArquivo;
-	private String title;
-	private JTextArea txCodigo;
-	private SimpleNode arvore;
-	private Space compilador;
-	private File arquivo;
 	
+	private JFileChooser fcEscolherArquivo;
+	
+	private String title;
+	
+	private JTextArea txCodigo;
+	private JTextArea txArvore;
+	private JTextArea txConsole;
+	
+	private SimpleNode arvore;
+	
+	private Space compilador;
+	
+	private File arquivo;
 	
 	public FrameSpaceCompiler() {
 		super();
@@ -51,31 +59,26 @@ public class FrameSpaceCompiler extends JPanel implements ActionListener{
 		tela.setSize(1080, 720);
 		tela.setTitle("Space Compiler");
 		
-		
-		
 		JPanel panelButtons = new JPanel();
 		JPanel panelCodigo = new JPanel();
 		JPanel panelArvore = new JPanel();
 		
 		setTxCodigo(new JTextArea());
+		setTxArvore(new JTextArea());
 		
-//		txCodigo.setEditable(false);
+		txArvore.setEditable(false);
 		
-		Font fonteTxCodigo = txCodigo.getFont();
-		Font novaFonte = fonteTxCodigo.deriveFont(16f);
-		
-		txCodigo.setFont(novaFonte);
+		txCodigo.setFont(txCodigo.getFont().deriveFont(16f));
 		
 		JScrollPane scrollTextArea = new JScrollPane(txCodigo);
-//		JScrollPane scrollArvoreSintatica = new JScro
-		
+		JScrollPane scrollArvoreSintatica = new JScrollPane(txArvore);
 		
 		panelCodigo.setSize(540, 590);
 		panelCodigo.setLayout(new BorderLayout());
-		panelCodigo.setBackground(Color.GREEN);
 		
 		panelArvore.setSize(540, 590);
 		panelArvore.setLocation(540, 0);
+		panelArvore.setLayout(new BorderLayout());
 		
 		panelButtons.setSize(1080, 100);
 		panelButtons.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 30));
@@ -96,7 +99,9 @@ public class FrameSpaceCompiler extends JPanel implements ActionListener{
 		btArvoreConsole.addActionListener(e -> trocarVisualizacao());
 		
 		panelCodigo.add(scrollTextArea);
-//		panelButtons.add(labelPrincipal);
+		
+		panelArvore.add(scrollArvoreSintatica);
+		
 		panelButtons.add(btCompilar);
 		panelButtons.add(btPegarArquivo);
 		panelButtons.add(btArvoreConsole);
@@ -112,7 +117,7 @@ public class FrameSpaceCompiler extends JPanel implements ActionListener{
 		tela.setVisible(true);
 
 	}
-	
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		
@@ -154,26 +159,23 @@ public class FrameSpaceCompiler extends JPanel implements ActionListener{
 	
 	@SuppressWarnings("static-access")
 	public void compilarCodigo() {
-		System.out.println("Aqui será gerado a árvore sintática");
-		System.out.println(getTxCodigo().getText());
-		
-		
-		try {
-//			if(compilador == null) {
-				compilador = new Space(new FileReader(getArquivo()));
-//			}
-			setArvore(compilador.inicio());
-		} catch (ParseException e1) {
-			e1.printStackTrace();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		finally {
-//			compilador.ReInit(null);
-		}
-		getArvore().dump(" --->");
+	    System.out.println("Aqui será gerada a árvore sintática");
+	    System.out.println(getTxCodigo().getText());
+
+	    try {
+	        compilador = new Space(new FileReader(getArquivo()));
+	        setArvore(compilador.inicio());
+	        if (getArvore() != null) {
+	            txArvore.setText(""); 
+	            getArvore().dump(txArvore);
+	        }
+	    } catch (ParseException e1) {
+	        e1.printStackTrace();
+	    } catch (FileNotFoundException e) {
+	        e.printStackTrace();
+	    }
 	}
-	
+
 	public void trocarVisualizacao() {
 	}
 	
@@ -250,5 +252,13 @@ public class FrameSpaceCompiler extends JPanel implements ActionListener{
 
 	public void setArquivo(File arquivo) {
 		this.arquivo = arquivo;
+	}
+	
+	public JTextArea getTxArvore() {
+		return txArvore;
+	}
+
+	public void setTxArvore(JTextArea txArvore) {
+		this.txArvore = txArvore;
 	}
 }
