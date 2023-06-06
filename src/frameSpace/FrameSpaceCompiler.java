@@ -56,7 +56,7 @@ public class FrameSpaceCompiler extends JPanel implements ActionListener{
 	
 	public void initTela(JFrame tela) {
 		
-		tela.setSize(1080, 720);
+		tela.setSize(1088, 720);
 		tela.setTitle("Space Compiler");
 		
 		JPanel panelButtons = new JPanel();
@@ -118,6 +118,7 @@ public class FrameSpaceCompiler extends JPanel implements ActionListener{
 
 	}
 
+	@SuppressWarnings("static-access")
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		
@@ -141,6 +142,12 @@ public class FrameSpaceCompiler extends JPanel implements ActionListener{
 					resultado += texto + System.getProperty("line.separator");
 				}
 				
+				if (compilador == null) {
+					compilador = new Space(new FileReader(getArquivo()));
+				}else {
+					compilador.ReInit(new FileReader(getArquivo()));
+				}
+				
 				txCodigo.setText(resultado);
 				codigo.close();
 				
@@ -148,8 +155,7 @@ public class FrameSpaceCompiler extends JPanel implements ActionListener{
 				System.err.println("Arquivo não encontrado!");
 			}catch(IOException e2) {
 				System.err.println("Não foi possivel abrir o arquivo!");
-			}
-			
+	    	}
 		}
 		else {
 			System.out.println("Nenhum item selecionado!");
@@ -163,16 +169,20 @@ public class FrameSpaceCompiler extends JPanel implements ActionListener{
 	    System.out.println(getTxCodigo().getText());
 
 	    try {
-	        compilador = new Space(new FileReader(getArquivo()));
 	        setArvore(compilador.inicio());
-	        if (getArvore() != null) {
-	            txArvore.setText(""); 
-	            getArvore().dump(txArvore);
-	        }
-	    } catch (ParseException e1) {
+	        	if (getArvore() != null) {
+	        		txArvore.setText(""); 
+	        		getArvore().dump(txArvore);
+	        	}
+	    }catch (ParseException e1) {
 	        e1.printStackTrace();
-	    } catch (FileNotFoundException e) {
-	        e.printStackTrace();
+	    }
+	    finally {
+	    	try {
+				compilador.ReInit(new FileReader(getArquivo()));
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
 	    }
 	}
 
