@@ -10,6 +10,7 @@ PARSER_BEGIN(Space)
 
 package parser;
 import recovery.*;
+import javax.swing.JTextArea;
 
 public class Space
 {
@@ -37,7 +38,7 @@ public class Space
 //        }
 
 		SimpleNode node = Space.inicio();
-		node.dump(" -- > ");
+		node.dump(null, " -- > ");
       }
       catch (Exception e)
       {
@@ -74,16 +75,24 @@ public class Space
 	
   // o m\u00e9todo abaixo consome tokens at\u00e9 alcan\u00e7ar um que perten\u00e7a ao conjunto
   // de sincroniza\u00e7\u00e3o
-  static void consumeUntil(RecoverySet g,
+
+  public static void consumeUntil(RecoverySet g,
 	                 ParseException e,
-	                 String met) throws ParseEOFException,
+	                 String met, JTextArea textArea) throws ParseEOFException,
 	                                    ParseException
   {
 	Token tok;
 	System.out.println();
 	System.out.println("*** " + met + " ***");
 	System.out.println("     Conjunto de sincroniza\u00e7\u00e3o: " + g);
+	if(textArea != null) { 
+		textArea.append(
+		  "+ Conjunto de sincroniza\u00e7\u00e3o: " + g
+		+ "\n*** " + met + " ***"
+		+ "     Conjunto de sincroniza\u00e7\u00e3o: " + g);
 		
+	}
+	
 	if (g == null) throw e; // se o conjunto \u00e9 null, propaga a exce\u00e7\u00e3o
 	
 	tok = getToken(1); // pega token corrente
@@ -221,7 +230,7 @@ void tipoRetorno():
   try { 
   	tipoVacuo() | tipoQuasar() | tipoLua() | tipoEstrela()
 	}catch(ParseException e) {
-		consumeUntil(tipoRetornoSinc, e, "Erro em - > tipoRetorno()");
+		consumeUntil(tipoRetornoSinc, e, "Erro em - > tipoRetorno()", null);
 	}
 }
 
@@ -231,7 +240,7 @@ void constantes():
 	try {
 		declaracaoDeVariaveis() igual() (numero() | gerarEstrela() ) pulaLinha()
 	}catch(ParseException e) {
-		consumeUntil(constantesSinc, e, "Erro em - > constantes()");
+		consumeUntil(constantesSinc, e, "Erro em - > constantes()", null);
 	}
 }
 
@@ -241,7 +250,7 @@ void bloco() :
   	try {
 		(declaracaoDeVariaveis()  | comandos())* pulaLinha()
 	}catch(ParseException e) {
-		consumeUntil(blocoSinc, e, "Erro em - > bloco()");
+		consumeUntil(blocoSinc, e, "Erro em - > bloco()", null);
 	}				
 }
 
@@ -251,7 +260,7 @@ void declaracaoDeVariaveis() :
 	try { 
 		iniciaVariavel() tipoDeVariavel() identificador() (modoDaVariavel())*
 	}catch(ParseException e) {
-		consumeUntil(declaracaoVarSinc, e, "Erro em - > declaracaoDeVariaveis()");
+		consumeUntil(declaracaoVarSinc, e, "Erro em - > declaracaoDeVariaveis()", null);
 	}
 }
 
@@ -266,7 +275,7 @@ void comandos() :
 | 		(buracoNegro()abreParenteses()iniciaVariavel()tipoDeVariavel()virgula()expressao()fechaParenteses())
 |		(buracoBranco()abreParenteses()expressao()fechaParenteses())
 	}catch(ParseException e) {
-		consumeUntil(comandosSinc, e, "Erro em - > comandos()");
+		consumeUntil(comandosSinc, e, "Erro em - > comandos()", null);
 	}
 }
 void atribuicao():
@@ -275,7 +284,7 @@ void atribuicao():
   	try { 
   		identificador() tipoAtribuicao() (valorPrimitivo()(modoDeAtribuicao())*)
 	}catch(ParseException e) {
-		consumeUntil(atribSinc, e, "Erro em - > atribuicao()");
+		consumeUntil(atribSinc, e, "Erro em - > atribuicao()", null);
 	}
 }
 
@@ -285,7 +294,7 @@ void tipoAtribuicao():
   	try {
   		igual() | maisIgual() | menosIgual()
 	}catch(ParseException e) {
-		consumeUntil(tipoAtribSinc, e, "Erro em - > tipoAtribuicao()");
+		consumeUntil(tipoAtribSinc, e, "Erro em - > tipoAtribuicao()", null);
 	}
 }
 
@@ -295,7 +304,7 @@ void modoDeAtribuicao():
   	try { 
   		operacaoAritmetica() valorPrimitivo()
 	}catch(ParseException e) {
-		consumeUntil(modoAtribSinc, e, "Erro em - > modoDeAtribuicao()");
+		consumeUntil(modoAtribSinc, e, "Erro em - > modoDeAtribuicao()", null);
 	}  
 }
 
@@ -305,7 +314,7 @@ void valorPrimitivo():
   	try { 
   		numero() | gerarEstrela() | identificador() | luaCheia() | luaNova() | tipoVacuo()
 	}catch(ParseException e) {
-		consumeUntil(valorPrimSinc, e, "Erro em - > valorPrimitivo()");
+		consumeUntil(valorPrimSinc, e, "Erro em - > valorPrimitivo()", null);
 	}
 }
 
@@ -315,7 +324,7 @@ void operacaoAritmetica():
   	try { 
  		( mais() | menos() | vezes() | divide() | abreParenteses() | fechaParenteses() )
 	}catch(ParseException e) {
-		consumeUntil(opSinc, e, "Erro em - > operacaoAritmetica()");
+		consumeUntil(opSinc, e, "Erro em - > operacaoAritmetica()", null);
 	}
 }
 
@@ -325,7 +334,7 @@ void decideAnaMarrom():
   	try { 
   		inicioFimBloco() (anaMarrom() inicioFimBloco()(bloco())* inicioFimBloco())*
 	}catch(ParseException e) {
-		consumeUntil(decAnaMarromSinc, e, "Erro em - > decideAnaMarrom()");
+		consumeUntil(decAnaMarromSinc, e, "Erro em - > decideAnaMarrom()", null);
 	}
 }
 
@@ -335,7 +344,7 @@ void condicao():
 	try { 
  	 	expressao()(maior() | menor() | maiorIgual() | menorIgual() | in())+expressao()
 	}catch(ParseException e) {
-		consumeUntil(condicaoSinc, e, "Erro em - > condicao()");
+		consumeUntil(condicaoSinc, e, "Erro em - > condicao()", null);
 	}
 }
 
@@ -345,7 +354,7 @@ void expressao() :
   	try { 
  	 	identificador() | numero() | gerarEstrela()	| luaCheia() | luaNova()
 	}catch(ParseException e) {
-		consumeUntil(expressaoSinc, e, "Erro em - > expressao()");
+		consumeUntil(expressaoSinc, e, "Erro em - > expressao()", null);
 	}
 }
 
@@ -355,7 +364,7 @@ void decideFinal() :
   	try { 
   		(and() condicao()| or() condicao())*fechaParenteses()
 	}catch(ParseException e) {
-		consumeUntil(decideFinalSinc, e, "Erro em - > decideFinal()");
+		consumeUntil(decideFinalSinc, e, "Erro em - > decideFinal()", null);
 	}
 }
 
@@ -365,7 +374,7 @@ void configuraEspaco():
 	try { 
 		abreParenteses()numero()virgula()numero()fechaParenteses()  
 	}catch(ParseException e) {
-		consumeUntil(configuraEspacoSinc, e, "Erro em - > configuraEspaco()");
+		consumeUntil(configuraEspacoSinc, e, "Erro em - > configuraEspaco()", null);
 	}
 }
 
@@ -375,7 +384,7 @@ void gerarEstrela():
   	try { 
   		delimitaEstrela()(numero() | identificador())*delimitaEstrela()
 	}catch(ParseException e) {
-		consumeUntil(gerarEstrelaSinc, e, "Erro em - > gerarEstrela()");
+		consumeUntil(gerarEstrelaSinc, e, "Erro em - > gerarEstrela()", null);
 	}
 }
 
@@ -385,7 +394,7 @@ void tipoDeVariavel() :
   	try { 
   		tipoQuasar() | tipoEstrela() | tipoLua()
 	}catch(ParseException e) {
-		consumeUntil(tipoVarSinc, e, "Erro em - > tipoDeVariavel()");
+		consumeUntil(tipoVarSinc, e, "Erro em - > tipoDeVariavel()", null);
 	}
 }
 
@@ -395,7 +404,7 @@ void modoDaVariavel() :
   	try { 
   		virgula() identificador()
 	}catch(ParseException e) {
-		consumeUntil(modoVarSinc, e, "Erro em - > modoDaVariavel()");
+		consumeUntil(modoVarSinc, e, "Erro em - > modoDaVariavel()", null);
 	}
 }
 
