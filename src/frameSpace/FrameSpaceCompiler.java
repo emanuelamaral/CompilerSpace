@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -21,10 +20,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import frameSpaceExtra.BordaNumerada;
 import parser.ParseException;
 import parser.SimpleNode;
 import parser.Space;
+import recovery.ParseEOFException;
 
 //import parser.ParseException;
 
@@ -44,11 +43,16 @@ public class FrameSpaceCompiler extends JPanel implements ActionListener{
 	private JTextArea txArvore;
 	private JTextArea txConsole;
 	
+	private JPanel panelArvore;
+	private JPanel panelConsole;
+	
 	private SimpleNode arvore;
 	
 	private Space compilador;
 	
 	private File arquivo;
+	
+	public boolean visivel = true;
 	
 	public FrameSpaceCompiler() {
 		super();
@@ -56,33 +60,44 @@ public class FrameSpaceCompiler extends JPanel implements ActionListener{
 	
 	public void initTela(JFrame tela) {
 		
-		tela.setSize(1088, 720);
+		tela.setSize(1088, 850);
 		tela.setTitle("Space Compiler");
 		
 		JPanel panelButtons = new JPanel();
 		JPanel panelCodigo = new JPanel();
-		JPanel panelArvore = new JPanel();
+		
+		setPanelArvore(new JPanel());
+		setPanelConsole(new JPanel());
 		
 		setTxCodigo(new JTextArea());
 		setTxArvore(new JTextArea());
+		setTxConsole(new JTextArea());
 		
-		txArvore.setEditable(false);
+		getTxArvore().setEditable(false);
+		getTxCodigo().setEditable(false);
+		getTxConsole().setEditable(false);
 		
-		txCodigo.setFont(txCodigo.getFont().deriveFont(16f));
+		getTxCodigo().setFont(txCodigo.getFont().deriveFont(16f));
 		
-		JScrollPane scrollTextArea = new JScrollPane(txCodigo);
-		JScrollPane scrollArvoreSintatica = new JScrollPane(txArvore);
+		JScrollPane scrollTextArea = new JScrollPane(getTxCodigo());
+		JScrollPane scrollArvoreSintatica = new JScrollPane(getTxArvore());
+		JScrollPane scrollConsole = new JScrollPane(getTxConsole());
 		
 		panelCodigo.setSize(540, 590);
 		panelCodigo.setLayout(new BorderLayout());
 		
-		panelArvore.setSize(540, 590);
-		panelArvore.setLocation(540, 0);
-		panelArvore.setLayout(new BorderLayout());
+		getPanelArvore().setSize(540, 590);
+		getPanelArvore().setLocation(540, 0);
+		getPanelArvore().setLayout(new BorderLayout());
+		
+		getPanelConsole().setSize(1080, 130);
+		getPanelConsole().setLocation(0, 590);
+		getPanelConsole().setLayout(new BorderLayout());
+		getPanelConsole().setBackground(Color.black);
 		
 		panelButtons.setSize(1080, 100);
 		panelButtons.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 30));
-		panelButtons.setLocation(0, 590);
+		panelButtons.setLocation(0, 720);
 		panelButtons.setBackground(Color.darkGray);
 		
 		JLabel labelPrincipal = new JLabel();
@@ -95,24 +110,20 @@ public class FrameSpaceCompiler extends JPanel implements ActionListener{
 		setBtCompilar(new JButton("Compilar"));
 		btCompilar.addActionListener(e -> compilarCodigo());
 		
-		setBtArvoreConsole(new JButton("Mostrar Console"));
-		btArvoreConsole.addActionListener(e -> trocarVisualizacao());
-		
 		panelCodigo.add(scrollTextArea);
-		
-		panelArvore.add(scrollArvoreSintatica);
+		getPanelArvore().add(scrollArvoreSintatica);
+		getPanelConsole().add(scrollConsole);
 		
 		panelButtons.add(btCompilar);
 		panelButtons.add(btPegarArquivo);
-		panelButtons.add(btArvoreConsole);
 	
-		
 		tela.setResizable(false);
 		
-		tela.add(panelButtons);
 		tela.add(panelCodigo);
-		tela.add(panelArvore);
-		
+		tela.add(getPanelArvore());
+		tela.add(getPanelConsole());
+		tela.add(panelButtons);
+
 		tela.getContentPane().add(this, "Center");
 		tela.setVisible(true);
 
@@ -168,15 +179,19 @@ public class FrameSpaceCompiler extends JPanel implements ActionListener{
 	    System.out.println("Aqui será gerada a árvore sintática");
 	    System.out.println(getTxCodigo().getText());
 
+	    
 	    try {
 	        setArvore(compilador.inicio());
 	        	if (getArvore() != null) {
 	        		txArvore.setText(""); 
 	        		getArvore().dump(txArvore);
+	        		compilador.consumeUntil(null, null, null, txConsole);
 	        	}
 	    }catch (ParseException e1) {
 	        e1.printStackTrace();
-	    }
+	    } catch (ParseEOFException e) {
+			e.printStackTrace();
+		} 
 	    finally {
 	    	try {
 				compilador.ReInit(new FileReader(getArquivo()));
@@ -185,10 +200,11 @@ public class FrameSpaceCompiler extends JPanel implements ActionListener{
 			}
 	    }
 	}
-
-	public void trocarVisualizacao() {
-	}
 	
+	public void setOutputTextArea(JTextArea erroConsole) {
+		setTxConsole(erroConsole);
+	}
+
 	public Dimension getPreferredSize() {
 		return new Dimension(200, 200);
 	}
@@ -270,5 +286,29 @@ public class FrameSpaceCompiler extends JPanel implements ActionListener{
 
 	public void setTxArvore(JTextArea txArvore) {
 		this.txArvore = txArvore;
+	}
+
+	public JPanel getPanelArvore() {
+		return panelArvore;
+	}
+
+	public void setPanelArvore(JPanel panelArvore) {
+		this.panelArvore = panelArvore;
+	}
+
+	public JPanel getPanelConsole() {
+		return panelConsole;
+	}
+
+	public void setPanelConsole(JPanel panelConsole) {
+		this.panelConsole = panelConsole;
+	}
+
+	public JTextArea getTxConsole() {
+		return txConsole;
+	}
+
+	public void setTxConsole(JTextArea txConsole) {
+		this.txConsole = txConsole;
 	}
 }
