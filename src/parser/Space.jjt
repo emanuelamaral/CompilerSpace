@@ -84,12 +84,12 @@ public class Space
 	Token tok;
 	System.out.println();
 	System.out.println("*** " + met + " ***");
-	System.out.println("     Conjunto de sincroniza\u00e7\u00e3o: " + g);
+	System.out.println("     Conjunto de sincronização: " + g);
 	if(textArea != null) { 
 		textArea.append(
-		  "+ Conjunto de sincroniza\u00e7\u00e3o: " + g
-		+ "\n*** " + met + " ***"
-		+ "     Conjunto de sincroniza\u00e7\u00e3o: " + g);
+		  "\n*** " + met + " ***"
+		 +"\nConjunto de sincronização: " + g
+		+ "\nConjunto de sincronização: " + g);
 		
 	}
 	
@@ -98,11 +98,17 @@ public class Space
 	tok = getToken(1); // pega token corrente
 	while ( ! eof )	{ // se n\u00e3o chegou ao fim do arquivo
 	  if ( g.contains(tok.kind)) {//achou um token no conjunto
-	    System.out.println("     Encontrado token de sincroniza\u00e7\u00e3o: " + 
+	    System.out.println("     Encontrado token de sincronização: " + 
 	                       im(tok.kind));
+	    if(textArea != null) {
+			textArea.append("     \nEncontrado token de sincronização -- > " + im(tok.kind));
+	    }
 	    break;
 	  }
 	  System.out.println("     Ignorando o token: " + im(tok.kind));
+	  if(textArea != null) {
+		textArea.append("     \nIgnorando o token -- > " + im(tok.kind));
+	  }
 	  getNextToken();     // pega pr\u00f3ximo token       
       tok = getToken(1);
 	  if (tok.kind == EOF && ! g.contains(EOF) ) // fim da entrada?   
@@ -114,7 +120,7 @@ public class Space
 	   
 	}
 	if ( eof )
-	  throw new ParseEOFException("Encontrei EOF onde n\u00e3o deveria.");
+	  throw new ParseEOFException("Encontrei EOF onde não deveria.");
   }
   
 }
@@ -212,7 +218,7 @@ TOKEN :  /* TERMINAIS COMPLEXOS */
 /* NÃO TERMINAIS */
 
 SimpleNode inicio() :
-{/*RecoverySet inicioSinc = First.inicio;*/}
+{/*RecoverySet inicioSinc = Follow.inicio;*/}
 {
 //  	try { 
    		(tipoRetorno() galaxia() identificador() abreParenteses() fechaParenteses() inicioFimBloco() pulaLinha() (bloco())* retorno() valorPrimitivo() inicioFimBloco() pulaLinha()
@@ -225,7 +231,7 @@ SimpleNode inicio() :
 }
 
 void tipoRetorno():
-{RecoverySet tipoRetornoSinc = First.tipoRetorno;}
+{RecoverySet tipoRetornoSinc = Follow.tipoRetorno;}
 {
   try { 
   	tipoVacuo() | tipoQuasar() | tipoLua() | tipoEstrela()
@@ -235,7 +241,7 @@ void tipoRetorno():
 }
 
 void constantes():
-{RecoverySet constantesSinc = First.constantes;}
+{RecoverySet constantesSinc = Follow.constantes;}
 {
 	try {
 		declaracaoDeVariaveis() igual() (numero() | gerarEstrela() ) pulaLinha()
@@ -245,7 +251,7 @@ void constantes():
 }
 
 void bloco() :
-{RecoverySet blocoSinc = First.bloco;}
+{RecoverySet blocoSinc = Follow.bloco;}
 {
   	try {
 		(declaracaoDeVariaveis()  | comandos())* pulaLinha()
@@ -255,7 +261,7 @@ void bloco() :
 }
 
 void declaracaoDeVariaveis() :
-{RecoverySet declaracaoVarSinc = First.declaracaoDeVariavel;}
+{RecoverySet declaracaoVarSinc = Follow.declaracaoDeVariavel;}
 {
 	try { 
 		iniciaVariavel() tipoDeVariavel() identificador() (modoDaVariavel())*
@@ -265,7 +271,7 @@ void declaracaoDeVariaveis() :
 }
 
 void comandos() :
-{RecoverySet comandosSinc = First.comandos;}
+{RecoverySet comandosSinc = Follow.comandos;}
 {
   	try { 
 	  	(atribuicao())
@@ -279,7 +285,7 @@ void comandos() :
 	}
 }
 void atribuicao():
-{RecoverySet atribSinc = First.atribuicao;}
+{RecoverySet atribSinc = Follow.atribuicao;}
 {
   	try { 
   		identificador() tipoAtribuicao() (valorPrimitivo()(modoDeAtribuicao())*)
@@ -289,7 +295,7 @@ void atribuicao():
 }
 
 void tipoAtribuicao():
-{RecoverySet tipoAtribSinc = First.tipoAtribuicao;}
+{RecoverySet tipoAtribSinc = Follow.tipoAtribuicao;}
 {
   	try {
   		igual() | maisIgual() | menosIgual()
@@ -299,7 +305,7 @@ void tipoAtribuicao():
 }
 
 void modoDeAtribuicao():
-{RecoverySet modoAtribSinc = First.modoDeAtribuicao;}
+{RecoverySet modoAtribSinc = Follow.modoDeAtribuicao;}
 {
   	try { 
   		operacaoAritmetica() valorPrimitivo()
@@ -309,7 +315,7 @@ void modoDeAtribuicao():
 }
 
 void valorPrimitivo():
-{RecoverySet valorPrimSinc = First.valorPrimitivo;}
+{RecoverySet valorPrimSinc = Follow.valorPrimitivo;}
 {
   	try { 
   		numero() | gerarEstrela() | identificador() | luaCheia() | luaNova() | tipoVacuo()
@@ -319,7 +325,7 @@ void valorPrimitivo():
 }
 
 void operacaoAritmetica():
-{RecoverySet opSinc = First.operacaoAritmetica;}
+{RecoverySet opSinc = Follow.operacaoAritmetica;}
 {
   	try { 
  		( mais() | menos() | vezes() | divide() | abreParenteses() | fechaParenteses() )
@@ -329,7 +335,7 @@ void operacaoAritmetica():
 }
 
 void decideAnaMarrom():
-{RecoverySet decAnaMarromSinc = First.decideAnaMarrom;}
+{RecoverySet decAnaMarromSinc = Follow.decideAnaMarrom;}
 {
   	try { 
   		inicioFimBloco() (anaMarrom() inicioFimBloco()(bloco())* inicioFimBloco())*
@@ -339,7 +345,7 @@ void decideAnaMarrom():
 }
 
 void condicao():
-{RecoverySet condicaoSinc = First.condicao;}
+{RecoverySet condicaoSinc = Follow.condicao;}
 {
 	try { 
  	 	expressao()(maior() | menor() | maiorIgual() | menorIgual() | in())+expressao()
@@ -349,7 +355,7 @@ void condicao():
 }
 
 void expressao() :
-{RecoverySet expressaoSinc = First.expressao;}
+{RecoverySet expressaoSinc = Follow.expressao;}
 {
   	try { 
  	 	identificador() | numero() | gerarEstrela()	| luaCheia() | luaNova()
@@ -359,7 +365,7 @@ void expressao() :
 }
 
 void decideFinal() :
-{RecoverySet decideFinalSinc = First.decideFinal;}
+{RecoverySet decideFinalSinc = Follow.decideFinal;}
 {
   	try { 
   		(and() condicao()| or() condicao())*fechaParenteses()
@@ -369,7 +375,7 @@ void decideFinal() :
 }
 
 void configuraEspaco():
-{RecoverySet configuraEspacoSinc = First.configuraEspaco;}
+{RecoverySet configuraEspacoSinc = Follow.configuraEspaco;}
 {
 	try { 
 		abreParenteses()numero()virgula()numero()fechaParenteses()  
@@ -379,7 +385,7 @@ void configuraEspaco():
 }
 
 void gerarEstrela():
-{RecoverySet gerarEstrelaSinc = First.gerarEstrela;}
+{RecoverySet gerarEstrelaSinc = Follow.gerarEstrela;}
 {
   	try { 
   		delimitaEstrela()(numero() | identificador())*delimitaEstrela()
@@ -389,7 +395,7 @@ void gerarEstrela():
 }
 
 void tipoDeVariavel() :
-{RecoverySet tipoVarSinc = First.tipoVariavel;}
+{RecoverySet tipoVarSinc = Follow.tipoVariavel;}
 {
   	try { 
   		tipoQuasar() | tipoEstrela() | tipoLua()
@@ -399,7 +405,7 @@ void tipoDeVariavel() :
 }
 
 void modoDaVariavel() :
-{RecoverySet modoVarSinc = First.modoVariavel;}
+{RecoverySet modoVarSinc = Follow.modoVariavel;}
 {
   	try { 
   		virgula() identificador()

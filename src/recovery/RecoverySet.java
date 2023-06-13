@@ -1,19 +1,20 @@
 package recovery;
 
-import parser.*;
+import java.util.HashSet;
+import java.util.Iterator;
 
-import java.util.*;
+import parser.Space;
 
 
 public class RecoverySet extends HashSet {
     public RecoverySet()
-    // cria conjunto vazio 
+    // cria conjunto vazio
      {
         super();
     }
 
     public RecoverySet(int t)
-    // cria conjunto com 1 tipo de token 
+    // cria conjunto com 1 tipo de token
      {
         this.add(new Integer(t));
     }
@@ -50,7 +51,8 @@ public class RecoverySet extends HashSet {
 
     // cria string descrevendo os tokens que pertencem
     // ao conjunto
-    public String toString() {
+    @Override
+	public String toString() {
         Iterator it = this.iterator();
         String s = "";
         int k;

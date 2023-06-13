@@ -5,3 +5,8 @@
 /SpaceTokenManager.java
 /Token.java
 /TokenMgrError.java
+/JJTSpaceState.java
+/Node.java
+/SimpleNode.java
+/Space.jj
+/SpaceTreeConstants.java
